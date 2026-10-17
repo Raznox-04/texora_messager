@@ -1,0 +1,129 @@
+{% extends "base.html" %}
+{% block title %}پنل مدیریت و نظارت هوشمند — تکسورا{% endblock %}
+
+{% block content %}
+<div class="admin-layout">
+    <!-- سایدبار پنل مدیریت -->
+    <aside class="admin-sidebar">
+        <div class="admin-brand">
+            <h2>🛡️ پنل مدیریت تکسورا</h2>
+            <p>سیستم نظارت هوشمند (AI)</p>
+        </div>
+
+        <nav class="admin-nav">
+            <button type="button" class="admin-nav-btn active" data-section="dashboard">📊 داشبورد و آمار</button>
+            <button type="button" class="admin-nav-btn" data-section="moderation">🤖 گزارش‌های هوش مصنوعی</button>
+            <button type="button" class="admin-nav-btn" data-section="users">👥 مدیریت کاربران</button>
+        </nav>
+
+        <div class="admin-sidebar-footer">
+            <button type="button" id="btn-theme-toggle" class="btn btn-secondary" onclick="toggleTheme()">🌙 تغییر تم</button>
+            <a href="/" class="btn btn-primary" style="text-decoration: none;">💬 بازگشت به چت</a>
+        </div>
+    </aside>
+
+    <!-- محتوای اصلی پنل مدیریت -->
+    <main class="admin-main">
+        <header class="admin-header">
+            <h1 id="admin-page-title">داشبورد و آمار کلی</h1>
+            <div style="display: flex; gap: 10px;">
+                <button type="button" id="btn-refresh-admin" class="btn btn-secondary">🔄 بروزرسانی داده‌ها</button>
+            </div>
+        </header>
+
+        <!-- بخش ۱: کارت‌های آمار -->
+        <section id="section-dashboard" class="admin-section">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <span class="stat-icon">👥</span>
+                    <div>
+                        <div class="stat-value" id="stat-total-users">۰</div>
+                        <div class="stat-label">کل کاربران</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-icon">💬</span>
+                    <div>
+                        <div class="stat-value" id="stat-total-messages">۰</div>
+                        <div class="stat-label">کل پیام‌های ارسالی</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-icon">🚨</span>
+                    <div>
+                        <div class="stat-value" id="stat-pending-reports">۰</div>
+                        <div class="stat-label">گزارش‌های در انتظار بررسی</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-icon">🚫</span>
+                    <div>
+                        <div class="stat-value" id="stat-blocked-users">۰</div>
+                        <div class="stat-label">کاربران مسدود شده</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- بخش ۲: جدول گزارش‌های هوش مصنوعی -->
+        <section id="section-moderation" class="admin-section" hidden>
+            <div class="admin-toolbar">
+                <select id="filter-report-status" class="admin-select">
+                    <option value="">همه وضعیت‌ها</option>
+                    <option value="pending" selected>در انتظار بررسی (Pending)</option>
+                    <option value="resolved">بررسی شده (Resolved)</option>
+                    <option value="auto_approved">تایید خودکار (Auto Approved)</option>
+                </select>
+            </div>
+
+            <div class="table-container">
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>شناسه</th>
+                            <th>کاربر</th>
+                            <th>متن پیام / توضیح AI</th>
+                            <th>دسته‌بندی</th>
+                            <th>شدت تخلف</th>
+                            <th>پیشنهاد AI</th>
+                            <th>عملیات مدیر</th>
+                        </tr>
+                    </thead>
+                    <tbody id="moderation-tbody">
+                        <tr><td colspan="7" style="text-align: center;">در حال بارگذاری...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- بخش ۳: جدول مدیریت کاربران -->
+        <section id="section-users" class="admin-section" hidden>
+            <div class="admin-toolbar">
+                <input type="text" id="admin-user-search" class="admin-input" placeholder="جستجوی نام کاربری یا ایمیل...">
+            </div>
+
+            <div class="table-container">
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>شناسه</th>
+                            <th>نام نمایشی</th>
+                            <th>نام کاربری</th>
+                            <th>نقش</th>
+                            <th>وضعیت حساب</th>
+                            <th>عملیات</th>
+                        </tr>
+                    </thead>
+                    <tbody id="users-tbody">
+                        <tr><td colspan="6" style="text-align: center;">در حال بارگذاری...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="/static/js/admin.js"></script>
+{% endblock %}

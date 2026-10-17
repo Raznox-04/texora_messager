@@ -1,0 +1,184 @@
+{% extends "base.html" %}
+{% block title %}تکسورا — پیام‌رسان{% endblock %}
+
+{% block content %}
+<div class="app-layout">
+    <!-- سایدبار راست -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <div class="user-info">
+                <div id="my-avatar" class="avatar">ک</div>
+                <div>
+                    <div id="my-name" class="user-name">کاربر تکسورا</div>
+                    <div id="connection-status" class="user-status online">آنلاین</div>
+                </div>
+            </div>
+            <div style="display: flex; gap: 6px; align-items: center;">
+                <!-- دکمه پنل مدیریت (فقط برای مدیران و ناظران نمایش داده می‌شود) -->
+                <a href="/admin" id="btn-admin-panel" class="icon-btn" title="پنل مدیریت" style="display: none; text-decoration: none; background: var(--primary-light); color: var(--primary);">🛡️</a>
+                <button type="button" id="btn-theme-toggle" class="icon-btn" onclick="toggleTheme()" title="تغییر تم">🌙</button>
+                <button type="button" id="btn-settings" class="icon-btn" title="تنظیمات حساب">⚙️</button>
+                <button type="button" id="btn-logout" class="icon-btn" title="خروج از حساب" style="color: var(--danger);">🚪</button>
+            </div>
+        </div>
+
+        <!-- تب‌های سایدبار -->
+        <div class="sidebar-tabs">
+            <button type="button" class="tab active" data-tab="chats">💬 چت‌ها</button>
+            <button type="button" class="tab" data-tab="groups">👥 گروه‌ها</button>
+            <button type="button" class="tab" data-tab="users">🔍 کاربران</button>
+        </div>
+
+        <!-- جعبه جستجو -->
+        <div class="search-box">
+            <input type="text" id="search-input" placeholder="جستجو در گفت‌وگوها و کاربران...">
+        </div>
+
+        <!-- لیست آیتم‌ها -->
+        <div id="sidebar-list" class="sidebar-list"></div>
+
+        <!-- فوتر سایدبار (دکمه‌های عملیاتی) -->
+        <div class="sidebar-footer">
+            <button type="button" id="btn-new-chat" class="btn btn-primary">➕ گفت‌وگوی جدید</button>
+            <button type="button" id="btn-new-group" class="btn btn-secondary" style="display: none;">👥 ساخت گروه</button>
+        </div>
+    </aside>
+
+    <!-- ناحیه اصلی چت -->
+    <main class="chat-area">
+        <!-- وضعیت خالی (وقتی چتی انتخاب نشده) -->
+        <div id="empty-state" class="empty-state">
+            <div class="empty-icon">💬</div>
+            <h2>به تکسورا خوش آمدید</h2>
+            <p>برای شروع صحبت، یک گفت‌وگو را از لیست سمت راست انتخاب کنید یا گفت‌وگوی جدیدی بسازید.</p>
+        </div>
+
+        <!-- نمای فعال چت -->
+        <div id="chat-view" class="chat-view" hidden>
+            <header class="chat-header">
+                <button type="button" id="btn-back" class="icon-btn mobile-only" title="بازگشت">➔</button>
+                <div class="chat-header-info">
+                    <div id="chat-avatar" class="avatar">گ</div>
+                    <div>
+                        <div id="chat-title" class="chat-title">عنوان گفت‌وگو</div>
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <span id="chat-subtitle" class="chat-subtitle"></span>
+                            <span id="typing-indicator" class="typing-indicator" hidden>در حال نوشتن...</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="chat-header-actions">
+                    <button type="button" id="btn-group-info" class="icon-btn" title="اطلاعات و اعضای گروه" style="display: none;">ℹ️</button>
+                </div>
+            </header>
+
+            <!-- لیست پیام‌ها -->
+            <div id="messages" class="messages"></div>
+
+            <!-- فرم ارسال پیام -->
+            <form id="message-form" class="message-form">
+                <input type="file" id="file-input" hidden>
+                <button type="button" id="btn-attach" class="icon-btn" title="ارسال تصویر یا فایل">📎</button>
+                <textarea id="message-input" rows="1" placeholder="پیام خود را بنویسید... (Enter برای ارسال)"></textarea>
+                <button type="submit" class="btn btn-primary" style="border-radius: 50%; width: 44px; height: 44px; padding: 0;" title="ارسال پیام">➤</button>
+            </form>
+        </div>
+    </main>
+</div>
+
+<!-- ۱. مودال شروع گفت‌وگوی خصوصی جدید -->
+<div id="modal-new-chat" class="modal">
+    <div class="modal-content">
+        <h3>💬 شروع گفت‌وگوی خصوصی</h3>
+        <div class="form-group">
+            <label for="new-chat-search">جستجوی نام یا نام کاربری</label>
+            <input type="text" id="new-chat-search" placeholder="حداقل ۲ حرف وارد کنید...">
+        </div>
+        <div id="new-chat-results" class="modal-list"></div>
+        <div class="modal-actions">
+            <button type="button" class="btn btn-secondary" data-close-modal>بستن</button>
+        </div>
+    </div>
+</div>
+
+<!-- ۲. مودال ساخت گروه جدید -->
+<div id="modal-new-group" class="modal">
+    <div class="modal-content">
+        <h3>👥 ساخت گروه جدید</h3>
+        <div class="form-group">
+            <label for="group-name">نام گروه</label>
+            <input type="text" id="group-name" placeholder="مثلاً: گروه برنامه‌نویسان پایتون">
+        </div>
+        <div class="form-group">
+            <label for="group-desc">توضیحات گروه (اختیاری)</label>
+            <textarea id="group-desc" rows="2" placeholder="درباره هدف گروه بنویسید..."></textarea>
+        </div>
+        <div class="form-group checkbox">
+            <label>
+                <input type="checkbox" id="group-public" checked>
+                گروه عمومی باشد (قابل مشاهده برای همه)
+            </label>
+        </div>
+        <div class="modal-actions">
+            <button type="button" class="btn btn-secondary" data-close-modal>انصراف</button>
+            <button type="button" id="btn-create-group" class="btn btn-primary">ایجاد گروه</button>
+        </div>
+    </div>
+</div>
+
+<!-- ۳. مودال تنظیمات حساب کاربری -->
+<div id="modal-settings" class="modal">
+    <div class="modal-content">
+        <h3>⚙️ تنظیمات پروفایل و حریم خصوصی</h3>
+        <div class="form-group">
+            <label for="settings-display-name">نام نمایشی</label>
+            <input type="text" id="settings-display-name">
+        </div>
+        <div class="form-group">
+            <label for="settings-bio">بیوگرافی (درباره من)</label>
+            <textarea id="settings-bio" rows="2" placeholder="متنی کوتاه درباره خودتان..."></textarea>
+        </div>
+        <div class="form-group checkbox">
+            <label>
+                <input type="checkbox" id="settings-online" checked>
+                نمایش وضعیت «آنلاین» به دیگران
+            </label>
+        </div>
+        <div class="form-group checkbox">
+            <label>
+                <input type="checkbox" id="settings-lastseen" checked>
+                نمایش زمان آخرین بازدید
+            </label>
+        </div>
+        <div class="modal-actions">
+            <button type="button" class="btn btn-secondary" data-close-modal>بستن</button>
+            <button type="button" id="btn-save-settings" class="btn btn-primary">ذخیره تغییرات</button>
+        </div>
+    </div>
+</div>
+
+<!-- ۴. مودال اطلاعات و مدیریت اعضای گروه -->
+<div id="modal-group-info" class="modal">
+    <div class="modal-content">
+        <h3 id="group-info-title">اطلاعات گروه</h3>
+        <p id="group-info-desc" style="color: var(--text-muted); font-size: 13.5px;"></p>
+
+        <div class="form-group" style="margin-top: 8px;">
+            <label>افزودن عضو جدید به گروه</label>
+            <input type="text" id="group-add-member-search" placeholder="جستجوی نام کاربری برای افزودن...">
+            <div id="group-add-member-results" class="modal-list"></div>
+        </div>
+
+        <h4 style="font-size: 14px; margin-top: 8px;">اعضای فعلی گروه</h4>
+        <div id="group-members-list" class="modal-list"></div>
+
+        <div class="modal-actions">
+            <button type="button" class="btn btn-secondary" data-close-modal>بستن</button>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="/static/js/app.js"></script>
+{% endblock %}

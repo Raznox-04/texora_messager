@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>{% block title %}تکسورا — پیام‌رسان هوشمند فارسی{% endblock %}</title>
+    <!-- فونت وزیرمتن -->
+    <link rel="preconnect" href="https://cdn.jsdelivr.net">
+    <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" rel="stylesheet" type="text/css" />
+    <!-- استایل اصلی -->
+    <link rel="stylesheet" href="/static/css/main.css">
+    <script>
+        // بارگذاری سریع تم ذخیره شده برای جلوگیری از پرش صفحه
+        (function() {
+            const savedTheme = localStorage.getItem("texora_theme") || "light";
+            document.documentElement.setAttribute("data-theme", savedTheme);
+        })();
+    </script>
+    {% block head %}{% endblock %}
+</head>
+<body>
+    {% block content %}{% endblock %}
+
+    <!-- کانتینر نمایش پیام‌های Toast -->
+    <div id="toast-container"></div>
+
+    <!-- اسکریپت‌های پایه -->
+    <script src="/static/js/api.js"></script>
+    <script src="/static/js/ui.js"></script>
+    <script>
+        // تابع سراسری تغییر تم روشن/تاریک
+        window.toggleTheme = function() {
+            const html = document.documentElement;
+            const current = html.getAttribute("data-theme") === "dark" ? "light" : "dark";
+            html.setAttribute("data-theme", current);
+            localStorage.setItem("texora_theme", current);
+            const themeBtn = document.getElementById("btn-theme-toggle");
+            if (themeBtn) themeBtn.textContent = current === "dark" ? "☀️" : "🌙";
+        };
+        document.addEventListener("DOMContentLoaded", () => {
+            const themeBtn = document.getElementById("btn-theme-toggle");
+            const current = document.documentElement.getAttribute("data-theme");
+            if (themeBtn) themeBtn.textContent = current === "dark" ? "☀️" : "🌙";
+        });
+    </script>
+    {% block scripts %}{% endblock %}
+</body>
+</html>

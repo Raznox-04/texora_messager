@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block title %}ثبت‌نام در تکسورا{% endblock %}
+
+{% block content %}
+<div class="auth-container">
+    <div class="auth-card">
+        <div class="auth-logo">
+            <h1>✨ عضویت در تکسورا</h1>
+            <p>ساخت حساب کاربری جدید در چند ثانیه</p>
+        </div>
+
+        <div id="auth-error" class="error-message" hidden style="margin-bottom: 16px;"></div>
+
+        <form id="register-form" class="auth-form">
+            <div class="form-group">
+                <label for="display_name">نام نمایشی</label>
+                <input type="text" id="display_name" name="display_name" placeholder="مثلاً: علی رضایی" required>
+            </div>
+
+            <div class="form-group">
+                <label for="username">نام کاربری (انگلیسی)</label>
+                <input type="text" id="username" name="username" placeholder="مثلاً: alireza" required dir="ltr">
+                <small>حداقل ۳ کاراکتر، شامل حروف انگلیسی و اعداد</small>
+            </div>
+
+            <div class="form-group">
+                <label for="email">ایمیل</label>
+                <input type="email" id="email" name="email" placeholder="you@example.com" required dir="ltr">
+            </div>
+
+            <div class="form-group">
+                <label for="password">رمز عبور</label>
+                <input type="password" id="password" name="password" placeholder="حداقل ۸ کاراکتر" required>
+            </div>
+
+            <button type="submit" id="btn-submit" class="btn btn-primary btn-block">ساخت حساب کاربری</button>
+        </form>
+
+        <div class="auth-link">
+            قبلاً ثبت‌نام کرده‌اید؟ <a href="/login">وارد شوید</a>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="/static/js/register.js"></script>
+{% endblock %}
